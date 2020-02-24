@@ -1,5 +1,5 @@
 {
-  "name": "aivec/response-builder",
+  "name": "aivec/response-handler",
   "description": "Utilities for creating error/info object stores, generating error/info API responses, etc.",
   "license": "GPL-2.0",
   "authors": [
