@@ -1,0 +1,17 @@
+{
+  "name": "aivec/response-builder",
+  "description": "Utilities for creating error/info object stores, generating error/info API responses, etc.",
+  "license": "GPL-2.0",
+  "authors": [
+    {
+      "name": "Evan Shaw",
+      "email": "evandanielshaw@gmail.com"
+    }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "Aivec\\ResponseHandler\\": "src"
+    }
+  }
+}
