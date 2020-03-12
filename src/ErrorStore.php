@@ -9,6 +9,7 @@ use InvalidArgumentException;
  */
 class ErrorStore {
 
+    const INTERNAL_SERVER_ERROR = 9998;
     const UNKNOWN_ERROR = 9999;
 
     /**
@@ -25,7 +26,6 @@ class ErrorStore {
      */
     private $setHttpResponseCode = true;
 
-
     /**
      * When toggled off, PHP's `http_response_code` function is not called
      * when creating an error response object
@@ -35,6 +35,32 @@ class ErrorStore {
      */
     public function httpResponseCodeToggleOff() {
         $this->setHttpResponseCode = false;
+    }
+
+    /**
+     * Instantiates error store with generic errors
+     *
+     * @author Evan D Shaw <evandanielshaw@gmail.com>
+     * @return void
+     * @throws InvalidArgumentException Thrown by `$this->addError()`.
+     */
+    public function __construct() {
+        load_textdomain('aivec-err', __DIR__ . '/languages/aivec-err-en.mo');
+        load_textdomain('aivec-err', __DIR__ . '/languages/aivec-err-ja.mo');
+        $this->addError(
+            $this,
+            self::UNKNOWN_ERROR,
+            500,
+            __('An unknown error occured.', 'aivec-err'),
+            __('An unknown error occured.', 'aivec-err')
+        );
+        $this->addError(
+            $this,
+            self::INTERNAL_SERVER_ERROR,
+            500,
+            __('An internal error occurred', 'aivec-err'),
+            __('An internal error occurred', 'aivec-err')
+        );
     }
 
     /**
@@ -181,6 +207,29 @@ class ErrorStore {
             'httpcode' => $httpcode,
             'debug' => $debugmsg,
             'message' => $message,
+        ];
+    }
+
+    /**
+     * Returns array with `errormetamap` and `errorcodes`.
+     *
+     * This method can be used in conjunction with our JavaScript error handling
+     * [library](https://github.com/aivec/reqres-utils). As such, the shape of the array
+     * is not arbitrary and should be passed as-is to any script that needs it.
+     *
+     * @author Evan D Shaw <evandanielshaw@gmail.com>
+     * @return array
+     */
+    public function getScriptInjectionVariables() {
+        $codemap = $this->getErrorCodeMap();
+        $codes = [];
+        foreach ($codemap as $code => $meta) {
+            $codes[$meta['errorname']] = $code;
+        }
+
+        return [
+            'errormetamap' => $codemap,
+            'errorcodes' => $codes,
         ];
     }
 }

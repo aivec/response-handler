@@ -1,0 +1,29 @@
+# Copyright (C) 2020 Aivec LLC.
+# This file is distributed under the GPL2.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-03-12T18:42:40+09:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: WP-CLI 2.4.0\n"
+"X-Domain: aivec-err\n"
+
+#: src/ErrorStore.php:51 src/ErrorStore.php:52
+msgid "An unknown error occured."
+msgstr "An unknown error occured."
+
+#. translators: the invalid error code
+#: src/ErrorStore.php:69
+msgid "An error with the code %d does not exist."
+msgstr "An error with the code %d does not exist."
+
+#: src/ErrorStore.php:72
+msgid "An internal error occurred"
+msgstr "An internal server error occurred."

@@ -13,5 +13,18 @@
     "psr-4": {
       "Aivec\\ResponseHandler\\": "src"
     }
+  },
+  "require-dev": {
+    "wp-cli/wp-cli": "^2.4",
+    "aivec/phpcs-wp": "^1.0",
+    "phpunit/phpunit": "^9.0"
+  },
+  "scripts": {
+    "lint": "phpcs -s --standard=Aivec --extensions=php .",
+    "lint-fix": "phpcbf -s --standard=Aivec --extensions=php .",
+    "create-pot": "wp i18n make-pot --domain=aivec-err . languages/messages.pot",
+    "update-pos": "find ./languages -name \"*.po\" | xargs -I % msgmerge -o % % languages/messages.pot",
+    "compile-pos": "find ./languages -name \"*.po\" | sed 's/\\.po//g' | xargs -I % msgfmt %.po -o %.mo",
+    "test": "phpunit tests"
   }
 }
