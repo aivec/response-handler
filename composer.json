@@ -1,6 +1,6 @@
 {
   "name": "aivec/response-handler",
-  "description": "Utilities for creating error/info object stores, generating error/info API responses, etc.",
+  "description": "Utilities for creating error object stores, generating error API responses, etc.",
   "license": "GPL-2.0",
   "authors": [
     {
@@ -22,9 +22,9 @@
   "scripts": {
     "lint": "phpcs -s --standard=Aivec --extensions=php .",
     "lint-fix": "phpcbf -s --standard=Aivec --extensions=php .",
-    "create-pot": "wp i18n make-pot --domain=aivec-err . languages/messages.pot",
-    "update-pos": "find ./languages -name \"*.po\" | xargs -I % msgmerge -o % % languages/messages.pot",
-    "compile-pos": "find ./languages -name \"*.po\" | sed 's/\\.po//g' | xargs -I % msgfmt %.po -o %.mo",
+    "create-pot": "wp i18n make-pot --domain=aivec-err . src/languages/messages.pot",
+    "update-pos": "find ./src/languages -name \"*.po\" | xargs -I % msgmerge -o % % src/languages/messages.pot",
+    "compile-pos": "find ./src/languages -name \"*.po\" | sed 's/\\.po//g' | xargs -I % msgfmt %.po -o %.mo",
     "test": "phpunit tests"
   }
 }

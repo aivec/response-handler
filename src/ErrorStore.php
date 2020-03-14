@@ -7,7 +7,7 @@ use InvalidArgumentException;
 /**
  * Error codes and corresponding messages
  */
-class ErrorStore {
+abstract class ErrorStore {
 
     const INTERNAL_SERVER_ERROR = 9998;
     const UNKNOWN_ERROR = 9999;
@@ -48,14 +48,12 @@ class ErrorStore {
         load_textdomain('aivec-err', __DIR__ . '/languages/aivec-err-en.mo');
         load_textdomain('aivec-err', __DIR__ . '/languages/aivec-err-ja.mo');
         $this->addError(
-            $this,
             self::UNKNOWN_ERROR,
             500,
             __('An unknown error occured.', 'aivec-err'),
             __('An unknown error occured.', 'aivec-err')
         );
         $this->addError(
-            $this,
             self::INTERNAL_SERVER_ERROR,
             500,
             __('An internal error occurred', 'aivec-err'),
@@ -89,11 +87,10 @@ class ErrorStore {
      * Useful for passing to scripts so we don't have to duplicate logic.
      *
      * @author Evan D Shaw <evandanielshaw@gmail.com>
-     * @param mixed $errobject Error class instance
      * @return array
      */
-    private function getChildConstants($errobject) {
-        return (new ReflectionClass(get_class($errobject)))->getConstants();
+    private function getChildConstants() {
+        return (new ReflectionClass(get_class()))->getConstants();
     }
 
     /**
@@ -105,22 +102,21 @@ class ErrorStore {
      * @return array
      */
     private function getGenericConstants() {
-        return (new ReflectionClass(__CLASS__))->getConstants();
+        return (new ReflectionClass(get_class($this)))->getConstants();
     }
 
     /**
      * Returns error code const string for a given code
      *
      * @author Evan D Shaw <evandanielshaw@gmail.com>
-     * @param mixed $errobject Error class instance
-     * @param int   $code
+     * @param int $code
      * @return string
      */
-    protected function getConstantNameByValue($errobject, $code) {
+    protected function getConstantNameByValue($code) {
         $codestring = 'UNKNOWN_ERROR';
         $constants = array_merge(
             $this->getGenericConstants(),
-            $this->getChildConstants($errobject)
+            $this->getChildConstants()
         );
         foreach ($constants as $name => $value) {
             if ($value === (int)$code) {
@@ -147,11 +143,13 @@ class ErrorStore {
      *
      * @author Evan D Shaw <evandanielshaw@gmail.com>
      * @param int   $code the error code
-     * @param mixed ...$msgvars optional parameters for generating context specific
-     *                          error messages at runtime
+     * @param array $debugvars optional parameters for generating context specific
+     *                         debug error messages at runtime
+     * @param array $msgvars optional parameters for generating context specific
+     *                       user facing error messages at runtime
      * @return array
      */
-    public function getErrorResponse($code, ...$msgvars) {
+    public function getErrorResponse($code, $debugvars = [], $msgvars = []) {
         if (!isset($this->codemap[$code])) {
             return $this->getDefaultErrorObject($code);
         }
@@ -164,7 +162,7 @@ class ErrorStore {
         return [
             'errorcode' => $code,
             'errorname' => $meta['errorname'],
-            'debug' => is_callable($meta['debug']) ? $meta['debug'](...$msgvars) : $meta['debug'],
+            'debug' => is_callable($meta['debug']) ? $meta['debug'](...$debugvars) : $meta['debug'],
             'message' => is_callable($meta['message']) ? $meta['message'](...$msgvars) : $meta['message'],
         ];
     }
@@ -173,11 +171,6 @@ class ErrorStore {
      * Adds a new error object with the given properties
      *
      * @author Evan D Shaw <evandanielshaw@gmail.com>
-     * @param mixed           $caller An instance of the calling class. Caller should be a child class whose
-     *                                constant values represent error codes. Constants of the calling class,
-     *                                combined with the default error codes provided by constants of this class,
-     *                                make up the final list of all error codes and associated messages. In
-     *                                practice, this parameter should always be `$this`
      * @param int             $code Any number representing an error code. Note that this method will throw
      *                              an exception if the error code provided already exists in $codemap (a map
      *                              containing all errors). This behavior is to make sure errors are not
@@ -193,7 +186,6 @@ class ErrorStore {
      * @throws InvalidArgumentException Thrown if `$code` already exists in codemap.
      */
     public function addError(
-        $caller,
         $code,
         $httpcode,
         $debugmsg,
@@ -203,7 +195,7 @@ class ErrorStore {
             throw new InvalidArgumentException($code . ' already exists in codemap');
         }
         $this->codemap[$code] = [
-            'errorname' => $this->getConstantNameByValue($caller, $code),
+            'errorname' => $this->getConstantNameByValue($code),
             'httpcode' => $httpcode,
             'debug' => $debugmsg,
             'message' => $message,
@@ -232,4 +224,14 @@ class ErrorStore {
             'errorcodes' => $codes,
         ];
     }
+
+    /**
+     * This method must be implemented by the child class
+     *
+     * All project specific errors should be added via this method.
+     *
+     * @author Evan D Shaw <evandanielshaw@gmail.com>
+     * @return void
+     */
+    abstract public function populate();
 }

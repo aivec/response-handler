@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-12T18:42:40+09:00\n"
+"POT-Creation-Date: 2020-03-14T21:03:12+09:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,15 +15,15 @@ msgstr ""
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: aivec-err\n"
 
-#: src/ErrorStore.php:51 src/ErrorStore.php:52
+#: src/ErrorStore.php:53 src/ErrorStore.php:54
 msgid "An unknown error occured."
-msgstr "An unknown error occured."
+msgstr "ご不明なエラーが発生しました。"
+
+#: src/ErrorStore.php:59 src/ErrorStore.php:60 src/ErrorStore.php:80
+msgid "An internal error occurred"
+msgstr "技術的なエラーが発生しました。"
 
 #. translators: the invalid error code
-#: src/ErrorStore.php:69
+#: src/ErrorStore.php:77
 msgid "An error with the code %d does not exist."
-msgstr "An error with the code %d does not exist."
-
-#: src/ErrorStore.php:72
-msgid "An internal error occurred"
-msgstr "An internal server error occurred."
+msgstr "コードバン「%d」のエラーは存在していません。"
