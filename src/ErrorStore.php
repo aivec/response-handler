@@ -13,7 +13,7 @@ abstract class ErrorStore {
     const UNKNOWN_ERROR = 9999;
 
     /**
-     * Array of error objects in the shape of code => object
+     * Array of error objects in the shape of code => `GenericError`
      *
      * @var array
      */
@@ -48,16 +48,22 @@ abstract class ErrorStore {
         load_textdomain('aivec-err', __DIR__ . '/languages/aivec-err-en.mo');
         load_textdomain('aivec-err', __DIR__ . '/languages/aivec-err-ja.mo');
         $this->addError(
-            self::UNKNOWN_ERROR,
-            500,
-            __('An unknown error occured.', 'aivec-err'),
-            __('An unknown error occured.', 'aivec-err')
+            new GenericError(
+                self::UNKNOWN_ERROR,
+                $this->getConstantNameByValue(self::UNKNOWN_ERROR),
+                500,
+                __('An unknown error occured.', 'aivec-err'),
+                __('An unknown error occured.', 'aivec-err')
+            )
         );
         $this->addError(
-            self::INTERNAL_SERVER_ERROR,
-            500,
-            __('An internal error occurred', 'aivec-err'),
-            __('An internal error occurred', 'aivec-err')
+            new GenericError(
+                self::INTERNAL_SERVER_ERROR,
+                $this->getConstantNameByValue(self::INTERNAL_SERVER_ERROR),
+                500,
+                __('An internal error occurred', 'aivec-err'),
+                __('An internal error occurred', 'aivec-err')
+            )
         );
     }
 
@@ -82,50 +88,39 @@ abstract class ErrorStore {
     }
 
     /**
-     * Returns array of all constants defined in the child class.
-     *
-     * Useful for passing to scripts so we don't have to duplicate logic.
-     *
-     * @author Evan D Shaw <evandanielshaw@gmail.com>
-     * @return array
-     */
-    private function getChildConstants() {
-        return (new ReflectionClass(get_class()))->getConstants();
-    }
-
-    /**
      * Returns array of all constants defined in this class.
      *
-     * Useful for passing to scripts so we don't have to duplicate logic.
-     *
      * @author Evan D Shaw <evandanielshaw@gmail.com>
      * @return array
      */
-    private function getGenericConstants() {
+    private function getConstants() {
         return (new ReflectionClass(get_class($this)))->getConstants();
     }
 
     /**
-     * Returns error code const string for a given code
+     * This class parses all constants in the **parent and child** class and returns
+     * the corresponding constant name for a given constant value
      *
      * @author Evan D Shaw <evandanielshaw@gmail.com>
-     * @param int $code
+     * @param string|int $code
      * @return string
+     * @throws InvalidArgumentException Thrown if no such constant exists.
      */
     protected function getConstantNameByValue($code) {
-        $codestring = 'UNKNOWN_ERROR';
-        $constants = array_merge(
-            $this->getGenericConstants(),
-            $this->getChildConstants()
-        );
+        $constantname = '';
+        $constants = $this->getConstants();
         foreach ($constants as $name => $value) {
-            if ($value === (int)$code) {
-                $codestring = $name;
+            if ($value === $code) {
+                $constantname = $name;
                 break;
             }
         }
 
-        return $codestring;
+        if (empty($constantname)) {
+            throw new InvalidArgumentException('A constant with the value ' . (string)$code . ' does not exist.');
+        }
+
+        return $constantname;
     }
 
     /**
@@ -156,14 +151,14 @@ abstract class ErrorStore {
 
         $meta = $this->codemap[$code];
         if ($this->setHttpResponseCode === true) {
-            http_response_code($meta['httpcode']);
+            http_response_code($meta->httpcode);
         }
         $this->setHttpResponseCode = true;
         return [
             'errorcode' => $code,
-            'errorname' => $meta['errorname'],
-            'debug' => is_callable($meta['debug']) ? $meta['debug'](...$debugvars) : $meta['debug'],
-            'message' => is_callable($meta['message']) ? $meta['message'](...$msgvars) : $meta['message'],
+            'errorname' => $meta->errorname,
+            'debug' => is_callable($meta->debugmsg) ? $meta->debugmsg(...$debugvars) : $meta->debugmsg,
+            'message' => is_callable($meta->message) ? $meta->message(...$msgvars) : $meta->message,
         ];
     }
 
@@ -171,35 +166,15 @@ abstract class ErrorStore {
      * Adds a new error object with the given properties
      *
      * @author Evan D Shaw <evandanielshaw@gmail.com>
-     * @param int             $code Any number representing an error code. Note that this method will throw
-     *                              an exception if the error code provided already exists in $codemap (a map
-     *                              containing all errors). This behavior is to make sure errors are not
-     *                              overwritten.
-     * @param int             $httpcode The HTTP code of the error
-     * @param callable|string $debugmsg A string message, or callable that constructs a message and takes
-     *                                  any number of arguments. The debug message is for developers and
-     *                                  should not be shown to end users.
-     * @param callable|string $message A string message, or callable that constructs a message and takes
-     *                                 any number of arguments. This message should be a user facing
-     *                                 message and should not contain debug information.
+     * @param GenericError $errorobj
      * @return void
      * @throws InvalidArgumentException Thrown if `$code` already exists in codemap.
      */
-    public function addError(
-        $code,
-        $httpcode,
-        $debugmsg,
-        $message
-    ) {
-        if (isset($this->codemap[$code])) {
-            throw new InvalidArgumentException($code . ' already exists in codemap');
+    public function addError(GenericError $errorobj) {
+        if (isset($this->codemap[$errorobj->errorcode])) {
+            throw new InvalidArgumentException($errorobj->errorcode . ' already exists in codemap');
         }
-        $this->codemap[$code] = [
-            'errorname' => $this->getConstantNameByValue($code),
-            'httpcode' => $httpcode,
-            'debug' => $debugmsg,
-            'message' => $message,
-        ];
+        $this->codemap[$errorobj->errorcode] = $errorobj;
     }
 
     /**
@@ -216,7 +191,7 @@ abstract class ErrorStore {
         $codemap = $this->getErrorCodeMap();
         $codes = [];
         foreach ($codemap as $code => $meta) {
-            $codes[$meta['errorname']] = $code;
+            $codes[$meta->errorname] = $code;
         }
 
         return [
