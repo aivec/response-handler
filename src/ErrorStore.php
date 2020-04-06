@@ -142,7 +142,7 @@ abstract class ErrorStore {
      *                         debug error messages at runtime
      * @param array $msgvars optional parameters for generating context specific
      *                       user facing error messages at runtime
-     * @return array
+     * @return GenericError
      */
     public function getErrorResponse($code, $debugvars = [], $msgvars = []) {
         if (!isset($this->codemap[$code])) {
@@ -154,12 +154,14 @@ abstract class ErrorStore {
             http_response_code($meta->httpcode);
         }
         $this->setHttpResponseCode = true;
-        return [
-            'errorcode' => $code,
-            'errorname' => $meta->errorname,
-            'debug' => is_callable($meta->debugmsg) ? $meta->debugmsg(...$debugvars) : $meta->debugmsg,
-            'message' => is_callable($meta->message) ? $meta->message(...$msgvars) : $meta->message,
-        ];
+
+        return new GenericError(
+            $meta->errorcode,
+            $meta->errorname,
+            $meta->httpcode,
+            is_callable($meta->debugmsg) ? $meta->debugmsg(...$debugvars) : $meta->debugmsg,
+            is_callable($meta->message) ? $meta->message(...$msgvars) : $meta->message,
+        );
     }
 
     /**

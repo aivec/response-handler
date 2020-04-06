@@ -1,10 +1,12 @@
 <?php
 namespace Aivec\ResponseHandler;
 
+use JsonSerializable;
+
 /**
  * Represents a generic error object
  */
-class GenericError {
+class GenericError implements JsonSerializable {
 
     /**
      * Error code. May be a string or integer
@@ -70,5 +72,20 @@ class GenericError {
         $this->httpcode = $httpcode;
         $this->debugmsg = $debugmsg;
         $this->message = $message;
+    }
+
+    /**
+     * JSON serializes `GenericError` object for consumption by front-end
+     *
+     * @author Evan D Shaw <evandanielshaw@gmail.com>
+     * @return array
+     */
+    public function jsonSerialize() {
+        return [
+            'errorcode' => $this->errorcode,
+            'errorname' => $this->errorname,
+            'debug' => is_callable($this->debugmsg) ? '' : $this->debugmsg,
+            'message' => is_callable($this->message) ? '' : $this->message,
+        ];
     }
 }
