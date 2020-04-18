@@ -75,16 +75,17 @@ abstract class ErrorStore {
      * @return array
      */
     public function getDefaultErrorObject($code) {
-        return [
-            'errorcode' => 9999,
-            'errorname' => 'UNKNOWN_ERROR',
-            'debug' => sprintf(
+        return new GenericError(
+            9999,
+            'UNKNOWN_ERROR',
+            500,
+            sprintf(
                 // translators: the invalid error code
                 __('An error with the code %d does not exist.', 'aivec-err'),
                 $code
             ),
-            'message' => __('An internal error occurred', 'aivec-err'),
-        ];
+            __('An internal error occurred', 'aivec-err')
+        );
     }
 
     /**
@@ -144,7 +145,7 @@ abstract class ErrorStore {
      *                       user facing error messages at runtime
      * @return GenericError
      */
-    public function getErrorResponse($code, $debugvars = [], $msgvars = []) {
+    public function getErrorResponse($code, array $debugvars = [], array $msgvars = []) {
         if (!isset($this->codemap[$code])) {
             return $this->getDefaultErrorObject($code);
         }
@@ -159,8 +160,8 @@ abstract class ErrorStore {
             $meta->errorcode,
             $meta->errorname,
             $meta->httpcode,
-            is_callable($meta->debugmsg) ? $meta->debugmsg(...$debugvars) : $meta->debugmsg,
-            is_callable($meta->message) ? $meta->message(...$msgvars) : $meta->message,
+            is_callable($meta->debugmsg) ? call_user_func($meta->debugmsg, ...$debugvars) : $meta->debugmsg,
+            is_callable($meta->message) ? call_user_func($meta->message, ...$msgvars) : $meta->message,
         );
     }
 
