@@ -161,7 +161,7 @@ abstract class ErrorStore {
             $meta->errorname,
             $meta->httpcode,
             is_callable($meta->debugmsg) ? call_user_func($meta->debugmsg, ...$debugvars) : $meta->debugmsg,
-            is_callable($meta->message) ? call_user_func($meta->message, ...$msgvars) : $meta->message,
+            is_callable($meta->message) ? call_user_func($meta->message, ...$msgvars) : $meta->message
         );
     }
 
