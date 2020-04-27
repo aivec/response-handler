@@ -46,6 +46,14 @@ class GenericError implements JsonSerializable {
     public $message;
 
     /**
+     * A string message, or callable that constructs a message and takes
+     * any number of arguments
+     *
+     * @var callable|string
+     */
+    public $adminmsg;
+
+    /**
      * Creates a new error object with the given properties
      *
      * @author Evan D Shaw <evandanielshaw@gmail.com>
@@ -58,6 +66,9 @@ class GenericError implements JsonSerializable {
      * @param callable|string $message A string message, or callable that constructs a message and takes
      *                                 any number of arguments. This message should be a user facing
      *                                 message and should not contain debug information.
+     * @param callable|string $adminmsg A string message, or callable that constructs a message and takes
+     *                                  any number of arguments. This message should be an admin facing
+     *                                  message. Default: empty string
      * @return void
      */
     public function __construct(
@@ -65,13 +76,15 @@ class GenericError implements JsonSerializable {
         $errorname,
         $httpcode,
         $debugmsg,
-        $message
+        $message,
+        $adminmsg = ''
     ) {
         $this->errorcode = $errorcode;
         $this->errorname = $errorname;
         $this->httpcode = $httpcode;
         $this->debugmsg = $debugmsg;
         $this->message = $message;
+        $this->adminmsg = $adminmsg;
     }
 
     /**
@@ -86,6 +99,7 @@ class GenericError implements JsonSerializable {
             'errorname' => $this->errorname,
             'debug' => is_callable($this->debugmsg) ? '' : $this->debugmsg,
             'message' => is_callable($this->message) ? '' : $this->message,
+            'adminmsg' => is_callable($this->adminmsg) ? '' : $this->adminmsg,
         ];
     }
 }
