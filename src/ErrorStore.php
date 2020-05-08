@@ -194,6 +194,35 @@ abstract class ErrorStore {
     }
 
     /**
+     * Merges a separate instance of an `ErrorStore` `codemap` into this instance's
+     * `codemap`
+     *
+     * Note that unless `$disallowDuplicates` is `true`, the passed in `ErrorStore`
+     * instance will overwrite errors that have the same code
+     *
+     * @author Evan D Shaw <evandanielshaw@gmail.com>
+     * @param ErrorStore $estore
+     * @param bool       $disallowDuplicates default: `true`
+     * @throws InvalidArgumentException Thrown if a code from `$estore` already exists in codemap.
+     * @return void
+     */
+    public function mergeErrorStoreInstance(ErrorStore $estore, $disallowDuplicates = true) {
+        if ($disallowDuplicates === false) {
+            $this->codemap = array_merge($this->codemap, $estore->getErrorCodeMap());
+            return;
+        }
+
+        $whitelisted = [self::INTERNAL_SERVER_ERROR, self::UNKNOWN_ERROR];
+        $emap = $estore->getErrorCodeMap();
+        foreach ($emap as $code => $gerror) {
+            if (isset($this->codemap[$code]) && !in_array($code, $whitelisted, true)) {
+                throw new InvalidArgumentException($code . ' already exists in codemap. Aborting merge.');
+            }
+        }
+        $this->codemap = array_merge($this->codemap, $estore->getErrorCodeMap());
+    }
+    
+    /**
      * Returns array with `errormetamap` and `errorcodes`.
      *
      * This method can be used in conjunction with our JavaScript error handling
