@@ -45,8 +45,12 @@ abstract class ErrorStore {
      * @throws InvalidArgumentException Thrown by `$this->addError()`.
      */
     public function __construct() {
-        load_textdomain('aivec-err', __DIR__ . '/languages/aivec-err-en.mo');
-        load_textdomain('aivec-err', __DIR__ . '/languages/aivec-err-ja.mo');
+        $mopath = __DIR__ . '/languages/aivec-err-' . get_locale() . '.mo';
+        if (file_exists($mopath)) {
+            load_textdomain('aivec-err', $mopath);
+        } else {
+            load_textdomain('aivec-err', __DIR__ . '/languages/aivec-err-en.mo');
+        }
         $this->addError(
             new GenericError(
                 self::UNKNOWN_ERROR,
