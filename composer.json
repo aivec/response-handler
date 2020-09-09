@@ -8,7 +8,9 @@
       "email": "evandanielshaw@gmail.com"
     }
   ],
-  "require": {},
+  "require": {
+    "psr/log": "^1.1"
+  },
   "autoload": {
     "psr-4": {
       "Aivec\\ResponseHandler\\": "src"

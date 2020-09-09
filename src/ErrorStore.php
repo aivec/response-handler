@@ -172,14 +172,20 @@ abstract class ErrorStore {
         }
         $this->setHttpResponseCode = true;
 
-        return new GenericError(
+        $e = new GenericError(
             $meta->errorcode,
             $meta->errorname,
             $meta->httpcode,
             is_callable($meta->debugmsg) ? call_user_func($meta->debugmsg, ...$debugvars) : $meta->debugmsg,
             is_callable($meta->message) ? call_user_func($meta->message, ...$msgvars) : $meta->message,
-            is_callable($meta->adminmsg) ? call_user_func($meta->adminmsg, ...$adminvars) : $meta->adminmsg
+            is_callable($meta->adminmsg) ? call_user_func($meta->adminmsg, ...$adminvars) : $meta->adminmsg,
+            $meta->logger
         );
+        if ($meta->logger !== null) {
+            $meta->logger->error($e);
+        }
+
+        return $e;
     }
 
     /**
