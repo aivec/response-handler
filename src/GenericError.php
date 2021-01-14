@@ -1,4 +1,5 @@
 <?php
+
 namespace Aivec\ResponseHandler;
 
 use JsonSerializable;
@@ -8,8 +9,8 @@ use Psr\Log\LoggerAwareInterface;
 /**
  * Represents a generic error object
  */
-class GenericError implements JsonSerializable, LoggerAwareInterface {
-
+class GenericError implements JsonSerializable, LoggerAwareInterface
+{
     /**
      * Error code. May be a string or integer
      *

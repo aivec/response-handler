@@ -1,4 +1,5 @@
 <?php
+
 namespace Aivec\ResponseHandler;
 
 use ReflectionClass;
@@ -7,8 +8,8 @@ use InvalidArgumentException;
 /**
  * Error codes and corresponding messages
  */
-abstract class ErrorStore {
-
+abstract class ErrorStore
+{
     const INTERNAL_SERVER_ERROR = 9998;
     const UNKNOWN_ERROR = 9999;
 
@@ -231,7 +232,7 @@ abstract class ErrorStore {
         }
         $this->codemap = array_merge($this->codemap, $estore->getErrorCodeMap());
     }
-    
+
     /**
      * Returns array with `errormetamap` and `errorcodes`.
      *

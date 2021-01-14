@@ -17,16 +17,16 @@
     }
   },
   "require-dev": {
-    "wp-cli/wp-cli": "^2.4",
-    "aivec/phpcs-wp": "^1.0",
-    "phpunit/phpunit": "^9.0"
+    "phpunit/phpunit": "^9.0",
+    "aivec/phpcs-wp": "^2.0",
+    "wp-cli/i18n-command": "^2.2"
   },
   "scripts": {
-    "lint": "phpcs -s --standard=Aivec --extensions=php .",
-    "lint-fix": "phpcbf -s --standard=Aivec --extensions=php .",
+    "lint": "phpcs -ps --standard=AivecWP-5 .",
+    "lint:fix": "phpcbf -ps --standard=AivecWP-5 .",
     "i18n:create-pot": "wp i18n make-pot --domain=aivec-err . src/languages/messages.pot",
     "i18n:update-pos": "composer i18n:create-pot && find ./src/languages -name \"*.po\" | xargs -I % msgmerge -o % % src/languages/messages.pot",
-    "i18n:compile-pos": "find ./src/languages -name \"*.po\" | sed 's/\\.po//g' | xargs -I % msgfmt %.po -o %.mo",
+    "i18n:make-mo": "wp i18n make-mo ./src/languages",
     "test": "phpunit tests"
   }
 }

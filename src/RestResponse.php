@@ -1,11 +1,12 @@
 <?php
+
 namespace Aivec\ResponseHandler;
 
 /**
  * Simple model for a REST response object
  */
-class RestResponse {
-
+class RestResponse
+{
     /**
      * HTTP response code
      *
