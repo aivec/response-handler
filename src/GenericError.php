@@ -33,26 +33,26 @@ class GenericError implements JsonSerializable, LoggerAwareInterface
     public $httpcode;
 
     /**
-     * A string message, or callable that constructs a message and takes
+     * A string message, array of string messages, or callable that constructs a message and takes
      * any number of arguments
      *
-     * @var callable|string
+     * @var callable|string|string[]
      */
     public $debugmsg;
 
     /**
-     * A string message, or callable that constructs a message and takes
+     * A string message, array of string messages, or callable that constructs a message and takes
      * any number of arguments
      *
-     * @var callable|string
+     * @var callable|string|string[]
      */
     public $message;
 
     /**
-     * A string message, or callable that constructs a message and takes
+     * A string message, array of string messages, or callable that constructs a message and takes
      * any number of arguments
      *
-     * @var callable|string
+     * @var callable|string|string[]
      */
     public $adminmsg;
 
@@ -68,19 +68,19 @@ class GenericError implements JsonSerializable, LoggerAwareInterface
      * Creates a new error object with the given properties
      *
      * @author Evan D Shaw <evandanielshaw@gmail.com>
-     * @param int|string           $errorcode Any number|string representing an error code.
-     * @param string               $errorname Name of the error.
-     * @param int                  $httpcode The HTTP code of the error
-     * @param callable|string      $debugmsg A string message, or callable that constructs a message and takes
-     *                                       any number of arguments. The debug message is for developers and
-     *                                       should not be shown to end users.
-     * @param callable|string      $message A string message, or callable that constructs a message and takes
-     *                                      any number of arguments. This message should be a user facing
-     *                                      message and should not contain debug information.
-     * @param callable|string      $adminmsg A string message, or callable that constructs a message and takes
-     *                                       any number of arguments. This message should be an admin facing
-     *                                       message. Default: empty string
-     * @param LoggerInterface|null $logger Logger object. Default: `null`
+     * @param int|string               $errorcode Any number|string representing an error code.
+     * @param string                   $errorname Name of the error.
+     * @param int                      $httpcode The HTTP code of the error
+     * @param callable|string|string[] $debugmsg A string message, array of string messages, or callable that constructs
+     *                                           a message and takes any number of arguments. The debug message is for
+     *                                           developers and should not be shown to end users.
+     * @param callable|string|string[] $message A string message, array of string messages, or callable that constructs
+     *                                          a message and takes any number of arguments. This message should be a
+     *                                          user facing message and should not contain debug information.
+     * @param callable|string|string[] $adminmsg A string message, array of string messages, or callable that constructs
+     *                                           a message and takes any number of arguments. This message should be an
+     *                                           admin facing message. Default: ''
+     * @param LoggerInterface|null     $logger Logger object. Default: `null`
      * @return void
      */
     public function __construct(
@@ -121,7 +121,7 @@ class GenericError implements JsonSerializable, LoggerAwareInterface
      * Returns `$this` for easy chaining of other methods for setting optional properties
      *
      * @author Evan D Shaw <evandanielshaw@gmail.com>
-     * @param callable|string $message
+     * @param callable|string|string[] $message
      * @return GenericError
      */
     public function setAdminMessage($message) {
@@ -152,9 +152,26 @@ class GenericError implements JsonSerializable, LoggerAwareInterface
      * @return string
      */
     public function __toString() {
-        $debugmsg = is_callable($this->debugmsg) ? '' : $this->debugmsg;
-        $message = is_callable($this->message) ? '' : $this->message;
-        $adminmsg = is_callable($this->adminmsg) ? '' : $this->adminmsg;
+        $debugmsg = $this->debugmsg;
+        if (is_callable($debugmsg)) {
+            $debugmsg = '';
+        } elseif (is_array($debugmsg)) {
+            $debugmsg = join(',', $debugmsg);
+        }
+
+        $message = $this->message;
+        if (is_callable($message)) {
+            $message = '';
+        } elseif (is_array($message)) {
+            $message = join(',', $message);
+        }
+
+        $adminmsg = $this->adminmsg;
+        if (is_callable($adminmsg)) {
+            $adminmsg = '';
+        } elseif (is_array($adminmsg)) {
+            $adminmsg = join(',', $adminmsg);
+        }
 
         $s = '(Code: ' . $this->errorcode . ') (Name: ' . $this->errorname . ') [DebugMessage]: ' . $debugmsg;
         $s .= ' [UserMessage]: ' . $message;
