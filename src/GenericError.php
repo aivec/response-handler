@@ -33,6 +33,13 @@ class GenericError implements JsonSerializable, LoggerAwareInterface
     public $httpcode;
 
     /**
+     * Optional data associated with the error
+     *
+     * @var mixed|null
+     */
+    public $data = null;
+
+    /**
      * A string message, array of string messages, or callable that constructs a message and takes
      * any number of arguments
      *
@@ -130,6 +137,18 @@ class GenericError implements JsonSerializable, LoggerAwareInterface
     }
 
     /**
+     * Sets `$data`
+     *
+     * @author Evan D Shaw <evandanielshaw@gmail.com>
+     * @param mixed $data
+     * @return GenericError
+     */
+    public function setData($data) {
+        $this->data = $data;
+        return $this;
+    }
+
+    /**
      * JSON serializes `GenericError` object for consumption by front-end
      *
      * @author Evan D Shaw <evandanielshaw@gmail.com>
@@ -142,6 +161,7 @@ class GenericError implements JsonSerializable, LoggerAwareInterface
             'debug' => is_callable($this->debugmsg) ? '' : $this->debugmsg,
             'message' => is_callable($this->message) ? '' : $this->message,
             'adminmsg' => is_callable($this->adminmsg) ? '' : $this->adminmsg,
+            'data' => $this->data,
         ];
     }
 
