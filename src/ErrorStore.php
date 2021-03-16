@@ -10,6 +10,8 @@ use InvalidArgumentException;
  */
 abstract class ErrorStore
 {
+    const FORBIDDEN = 9996;
+    const UNAUTHORIZED = 9997;
     const INTERNAL_SERVER_ERROR = 9998;
     const UNKNOWN_ERROR = 9999;
 
@@ -52,13 +54,24 @@ abstract class ErrorStore
         } else {
             load_textdomain('aivec-err', __DIR__ . '/languages/aivec-err-en.mo');
         }
+
+        $forbiddenError = __('Sorry, you are not allowed to do that.');
         $this->addError(
             new GenericError(
-                self::UNKNOWN_ERROR,
-                $this->getConstantNameByValue(self::UNKNOWN_ERROR),
-                500,
-                __('An unknown error occured.', 'aivec-err'),
-                __('An unknown error occured.', 'aivec-err')
+                self::FORBIDDEN,
+                $this->getConstantNameByValue(self::FORBIDDEN),
+                403,
+                $forbiddenError,
+                $forbiddenError
+            )
+        );
+        $this->addError(
+            new GenericError(
+                self::UNAUTHORIZED,
+                $this->getConstantNameByValue(self::UNAUTHORIZED),
+                401,
+                $forbiddenError,
+                $forbiddenError
             )
         );
         $this->addError(
@@ -68,6 +81,15 @@ abstract class ErrorStore
                 500,
                 __('An internal error occurred', 'aivec-err'),
                 __('An internal error occurred', 'aivec-err')
+            )
+        );
+        $this->addError(
+            new GenericError(
+                self::UNKNOWN_ERROR,
+                $this->getConstantNameByValue(self::UNKNOWN_ERROR),
+                500,
+                __('An unknown error occured.', 'aivec-err'),
+                __('An unknown error occured.', 'aivec-err')
             )
         );
     }
