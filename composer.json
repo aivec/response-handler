@@ -22,11 +22,16 @@
     "wp-cli/i18n-command": "^2.2"
   },
   "scripts": {
-    "lint": "phpcs -ps --standard=AivecWP-5 .",
-    "lint:fix": "phpcbf -ps --standard=AivecWP-5 .",
+    "lint": "phpcs -ps --standard=AivecWP-8 .",
+    "lint:fix": "phpcbf -ps --standard=AivecWP-8 .",
     "i18n:create-pot": "wp i18n make-pot --domain=aivec-err . src/languages/messages.pot",
     "i18n:update-pos": "composer i18n:create-pot && find ./src/languages -name \"*.po\" | xargs -I % msgmerge -o % % src/languages/messages.pot",
     "i18n:make-mo": "wp i18n make-mo ./src/languages",
     "test": "phpunit tests"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }
