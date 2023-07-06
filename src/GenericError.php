@@ -154,7 +154,7 @@ class GenericError implements JsonSerializable, LoggerAwareInterface
      * @author Evan D Shaw <evandanielshaw@gmail.com>
      * @return array
      */
-    public function jsonSerialize(): mixed {
+    public function jsonSerialize(): array {
         return [
             'errorcode' => $this->errorcode,
             'errorname' => $this->errorname,
